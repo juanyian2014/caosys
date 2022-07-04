@@ -1,0 +1,73 @@
+Respuesta a la tarea y necesidades para el funcionamiento.
+
+1. La aplicación como objetivo de la tarea no tiene login formulario.
+2. Se tabajo el acceso a datos desde ADO.NET pues Entity Framework pesento problemas en mi  PC.
+3. Crea estos dos proedimientos para MYSQL con el objetivo de la generacion de gráficos [
+
+
+CREATE PROCEDURE sp_receitasliquidas(
+  IN co_usuarios VARCHAR(2000),
+  IN mesini INT,
+  IN anhoini INT,
+  IN mesend INT,
+  IN anhoend INT
+)
+BEGIN
+
+SET @nvalue = REPLACE(co_usuarios,',','|');
+SELECT mc.*, cao_salario.brut_salario as costofixo,
+ROUND(( mc.receitaliquida - (cao_salario.brut_salario - mc.valorcomision)),2) as lucro FROM (SELECT t.co_usuario,t.no_usuario,t.mes, t.anho, SUM(t.receitaliquida) as receitaliquida , SUM(t.valorcomision) as valorcomision FROM (SELECT YEAR(cao_fatura.data_emissao) As anho, MONTH(cao_fatura.data_emissao) As mes,cao_os.co_usuario, cao_usuario.no_usuario,
+ROUND(cao_fatura.valor - (cao_fatura.valor * (cao_fatura.total_imp_inc /100 )),2) as receitaliquida,
+ROUND(((cao_fatura.valor - (cao_fatura.valor * (cao_fatura.total_imp_inc/100)))*cao_fatura.comissao_cn)/100,2) as valorcomision
+FROM cao_os
+INNER JOIN cao_usuario ON cao_usuario.co_usuario = cao_os.co_usuario
+INNER JOIN cao_fatura  ON cao_fatura.co_os = cao_os.co_os ) t
+WHERE t.co_usuario REGEXP(@nvalue) AND (t.anho >= anhoini AND t.anho <= anhoend) AND (t.mes >= mesini AND t.mes <= mesend)
+GROUP BY t.co_usuario,t.no_usuario,t.mes, t.anho
+ORDER BY t.co_usuario, t.anho, t.mes) mc
+INNER JOIN cao_salario ON cao_salario.co_usuario = mc.co_usuario;
+
+END
+
+
+CREATE PROCEDURE sp_receitasliquidasbyconsultor (
+  IN co_usuarios VARCHAR(2000),
+  IN mesini INT,
+  IN anhoini INT,
+  IN mesend INT,
+  IN anhoend INT
+)
+BEGIN
+
+SET @nvalue = REPLACE(co_usuarios,',','|');
+
+SELECT mc.co_usuario,mc.no_usuario, mc.receitaliquida FROM (SELECT t.co_usuario,t.no_usuario,t.mes, t.anho, SUM(t.receitaliquida) as receitaliquida , SUM(t.valorcomision) as valorcomision FROM (SELECT YEAR(cao_fatura.data_emissao) As anho, MONTH(cao_fatura.data_emissao) As mes,cao_os.co_usuario, cao_usuario.no_usuario,
+ROUND(cao_fatura.valor - (cao_fatura.valor * (cao_fatura.total_imp_inc /100 )),2) as receitaliquida,
+ROUND(((cao_fatura.valor - (cao_fatura.valor * (cao_fatura.total_imp_inc/100)))*cao_fatura.comissao_cn)/100,2) as valorcomision
+FROM cao_os
+INNER JOIN cao_usuario ON cao_usuario.co_usuario = cao_os.co_usuario
+INNER JOIN cao_fatura  ON cao_fatura.co_os = cao_os.co_os ) t
+WHERE t.co_usuario REGEXP(@nvalue) AND (t.anho >= anhoini AND t.anho <= anhoend) AND (t.mes >= mesini AND t.mes <= mesend)
+GROUP BY t.co_usuario
+ORDER BY t.co_usuario) mc;
+END
+
+4. En la tarea existe la intension de leer XML para crear afico de barra, pero esta es una tarea bien sencilla no permite datos dinámicos
+   lo cal fue sustituido por una solucion dinámica.
+
+5. No realice las capturas y manipulacon de los posibles erores, pues en la tarea no queda ben claro bajos los requerimientos de requisitos
+   las reglas de posibles valdaciones
+
+6 horas totaldedicadas 35 horas
+  Lunes 4 hoas
+  Martes 6 horas
+  Miecoles 5 horas
+  Jueves 8 horas 
+  Viernes  7 horas
+
+7. Proecto realizado con asp.net razor, bootstrap y Jquery.
+8. colores y diseños estan sujeos a necesidades  de requisitos en caso de un proyecto oficial.
+
+Espero haber cumplido con la tarea y quedo en espera de sus evalaciones y resultados.
+
+Atentamete Juan Carlos
